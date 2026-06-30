@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 面试复盘教练 · Interview Debrief Coach
 
-## Getting Started
+一个 AI 面试复盘工具:上传面试转录、连接你的项目经历,获得**温和但具体**的复盘报告——
+告诉你面试官在评估什么、哪些回答偏弱、为什么弱、怎么重写、该练哪些追问,并长期追踪反复出现的薄弱点。
 
-First, run the development server:
+> 它不是会议纪要工具。核心价值是把**转录 + JD + 公司背景 + 简历 + 项目经历**结合起来,
+> 给出公平、具体、可执行的面试辅导。
+
+## 功能
+
+- **总览 (`/dashboard`)** — pastel 风格仪表盘:数据磁贴、最近复盘、建议练习、反复出现的薄弱点
+- **项目经历库 (`/projects`)** — 为每个项目建卡(背景 / 限制 / 面试准备),AI 复盘时用作上下文,避免不公平的评价
+- **新建复盘 (`/interviews/new`)** — 多步表单:基本信息 → JD/公司 → 转录 → 关联项目 → 自我反思 → 生成报告
+- **复盘报告 (`/interviews/[id]`)** — 整体复盘、问题清单、重点问题深入拆解、重写回答、模拟追问、薄弱点标签、练习计划
+- **成长追踪 (`/growth`)** — 跨多场面试聚合薄弱点、问题类型、岗位方向
+- **我的简历 (`/profile`)** — 上传 PDF,浏览器本地解析出文字并识别成简历版式(可编辑)
+
+## 技术栈
+
+- [Next.js 16](https://nextjs.org/)(App Router)+ React 19 + TypeScript
+- Tailwind CSS v4
+- 数据暂存在浏览器 `localStorage`(无需后端 / 登录)
+- `pdfjs-dist` 客户端 PDF 文本解析
+
+## 本地运行
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 http://localhost:4173 即可(默认端口已设为 4173)。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 当前状态
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **AI 分析为 mock**:报告由 `lib/mock-report.ts` 的 `generateMockInterviewDebrief()` 生成——
+  它会读取转录和关联项目卡(含项目限制),产出结构化、措辞贴合的报告,但还不是真实大模型。
+  接入真实 [Claude](https://www.anthropic.com/) 时只需替换这一个函数。
+- 数据存在 `localStorage`,刷新不丢;换浏览器/设备不同步。
 
-## Learn More
+## 路线图
 
-To learn more about Next.js, take a look at the following resources:
+- [ ] 接入真实 Claude 分析(替换 mock 函数,并把简历喂入上下文)
+- [ ] 数据库持久化(当前 localStorage)
+- [ ] 简历结构化交给 AI(当前为启发式)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 目录结构
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/            页面与路由(dashboard / projects / interviews / growth / profile)
+components/     UI 组件、表单、侧边栏、图标
+lib/            类型、localStorage 存储、mock 报告、分析聚合、PDF 解析
+public/         pdf.js worker
+```
